@@ -703,8 +703,30 @@ def _upsert_discovered_account(connection, account, fallback_currency=None):
 	resource_uid = account.get("uid")
 	if not resource_uid:
 		frappe.throw(_("Enable Banking returned an account without a resource UID."))
-	identification_hash = _account_identity_hash(provider_identification_hash)
+	identification_hash = _account_identity_hash(provider_identification_hash
+	provider_currency = account.get("currency")
+	
+	if provider_currency == "XXX":
+    	if not fallback_currency:
+			frappe.throw(
+                _("The bank returned an unknown currency (XXX). Please configure a fallback currency.")
+            )
+        effective_currency = fallback_currency
+    else:
+        effective_currency = provider_currency
 
+        if (
+            fallback_currency
+            and provider_currency
+            and provider_currency != fallback_currency
+        ):
+            frappe.throw(
+                _(
+                    "Currency mismatch: the bank returned {0}, "
+                    "but you selected {1}. Please verify the account currency."
+                ).format(provider_currency, fallback_currency)
+    		)
+	
 	values = {
 		"connection": connection.name,
 		"company": connection.company,
@@ -719,11 +741,7 @@ def _upsert_discovered_account(connection, account, fallback_currency=None):
 		"account_name": account.get("name"),
 		"account_description": account.get("details"),
 		"product": account.get("product"),
-		"currency": (
-			fallback_currency
-			if account.get("currency") == "XXX" and fallback_currency
-			else account.get("currency")
-		),
+		"currency": effective_currency,
 		"provider_currency": account.get("currency"),
 		"usage": account.get("usage"),
 		"cash_account_type": account.get("cash_account_type"),
