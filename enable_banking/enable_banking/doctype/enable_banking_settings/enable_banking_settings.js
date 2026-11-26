@@ -57,6 +57,31 @@ function show_connect_bank_dialog(frm) {
 				label: __("Company"),
 				options: "Company",
 				reqd: 1,
+				onchange() {
+        			const company = dialog.get_value("company");
+
+        			dialog.set_value("fallback_currency", "");
+
+        			if (!company) return;
+
+        			frappe.db.get_value("Company", company, "default_currency")
+            			.then((response) => {
+                			if (dialog.get_value("company") !== company) return;
+
+                			dialog.set_value(
+                    			"fallback_currency",
+                    			response.message?.default_currency || ""
+                			);
+            			});
+    			},
+			},
+			{
+    			fieldname: "fallback_currency",
+    			fieldtype: "Link",
+    			label: __("Bank Account Currency"),
+    			options: "Currency",
+    			description: __("Defaults to the company currency. Change it if necessary."),
+    			reqd: 1,
 			},
 			{
 				fieldname: "parent_gl_account",
