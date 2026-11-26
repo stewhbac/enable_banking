@@ -724,6 +724,7 @@ def _upsert_discovered_account(connection, account, fallback_currency=None):
 			if account.get("currency") == "XXX" and fallbcak_currency
 			else account.get("currency")
 		),
+		"provider_currency": account.get("currency"),
 		"usage": account.get("usage"),
 		"cash_account_type": account.get("cash_account_type"),
 		"psu_status": account.get("psu_status"),
