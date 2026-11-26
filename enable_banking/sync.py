@@ -457,14 +457,10 @@ def _update_account_details(account, details: dict[str, Any]) -> None:
 
 	provider_currency = details.get("currency")
 
-	if (
-		provider_currency not in (None, "", "XXX")
-		and provider_currency != account.currency
-	):
+	if provider_currency not in (None, "", "XXX") and provider_currency != account.currency:
 		frappe.throw(
 			_(
-				"Currency mismatch during synchronization: "
-				"the bank returned {0}, but the account uses {1}."
+				"Currency mismatch during synchronization: the bank returned {0}, but the account uses {1}."
 			).format(provider_currency, account.currency)
 		)
 
@@ -482,9 +478,7 @@ def _update_account_details(account, details: dict[str, Any]) -> None:
 		"product": details.get("product"),
 		"currency": account.currency,
 		"provider_currency": (
-    		provider_currency
-			if provider_currency is not None
-			else account.provider_currency
+			provider_currency if provider_currency is not None else account.provider_currency
 		),
 		"usage": details.get("usage"),
 		"cash_account_type": details.get("cash_account_type"),

@@ -105,7 +105,7 @@ def _start_authorization(
 
 		if not fallback_currency or not frappe.db.exists("Currency", fallback_currency):
 			frappe.throw(_("Please select a valid fallback currency."))
-			
+
 	aspsp = _find_aspsp(country, aspsp_name, psu_type)
 	maximum_seconds = cint(aspsp.get("maximum_consent_validity"))
 	if maximum_seconds <= 0:

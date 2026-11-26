@@ -12,7 +12,7 @@ frappe.ui.form.on("Enable Banking Connection", {
 				})
 				.then((response) => {
 					frappe.show_alert(
-						__("Queued {0} account(s).", [response.message?.queued || 0]),
+						__("Queued {0} account(s).", [response.message?.queued || 0])
 					);
 					frm.reload_doc();
 				});
@@ -54,7 +54,7 @@ frappe.ui.form.on("Enable Banking Connection", {
 								freeze: true,
 							})
 							.then(() => frm.reload_doc());
-					},
+					}
 				);
 			});
 		} else {
@@ -69,7 +69,7 @@ frappe.ui.form.on("Enable Banking Connection", {
 								freeze: true,
 							})
 							.then(() => frappe.set_route("List", "Enable Banking Connection"));
-					},
+					}
 				);
 			});
 		}

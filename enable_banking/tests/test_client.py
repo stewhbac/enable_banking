@@ -207,8 +207,7 @@ class TestEnableBankingClient(unittest.TestCase):
 				"error": "WRONG_REQUEST_PARAMETERS",
 				"message": "Account account_id acc-123 failed for session session-456.",
 				"detail": (
-					"IBAN FI2112345600000785 JWT eyJheader.payload.signature "
-					"credentials: bank-password"
+					"IBAN FI2112345600000785 JWT eyJheader.payload.signature credentials: bank-password"
 				),
 			},
 		)
@@ -271,8 +270,7 @@ class TestEnableBankingClient(unittest.TestCase):
 
 	def test_log_sanitizer_redacts_free_text_bank_and_auth_identifiers(self):
 		sanitized = sanitize_for_log(
-			"account_id acc-123 session session-456 "
-			"IBAN FI2112345600000785 credentials: bank-password"
+			"account_id acc-123 session session-456 IBAN FI2112345600000785 credentials: bank-password"
 		)
 
 		for sensitive_value in (
