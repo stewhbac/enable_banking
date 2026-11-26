@@ -480,7 +480,7 @@ def _update_account_details(account, details: dict[str, Any]) -> None:
 		"account_name": details.get("name"),
 		"account_description": details.get("details"),
 		"product": details.get("product"),
-		"currency": (account.currency
+		"currency": account.currency,
 		"provider_currency": (
     		provider_currency
 			if provider_currency is not None
