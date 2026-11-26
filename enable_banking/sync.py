@@ -637,7 +637,7 @@ def _provider_datetime(value: Any) -> datetime | None:
 				parsed = datetime.combine(date.fromisoformat(value), time.min)
 			else:
 				parsed = get_datetime(value)
-		except TypeError, ValueError:
+		except (TypeError, ValueError):
 			return None
 	if parsed.tzinfo is not None:
 		parsed = convert_utc_to_system_timezone(parsed.astimezone(UTC))
@@ -651,7 +651,7 @@ def _parse_normalized_as_of(value: Any) -> datetime | None:
 		return value
 	try:
 		return get_datetime(value)
-	except TypeError, ValueError:
+	except (TypeError, ValueError):
 		return None
 
 
@@ -660,7 +660,7 @@ def _decimal_or_none(value: Any) -> Decimal | None:
 		return None
 	try:
 		return Decimal(str(value))
-	except InvalidOperation, ValueError:
+	except (InvalidOperation, ValueError):
 		return None
 
 
@@ -746,7 +746,7 @@ def _transaction_date(transaction: dict[str, Any]) -> date:
 			continue
 		try:
 			return getdate(value)
-		except TypeError, ValueError:
+		except (TypeError, ValueError):
 			continue
 	raise ValueError(_("Transaction has no valid booking, value, or transaction date."))
 
@@ -833,7 +833,7 @@ def _sha256_json(value: Any) -> str:
 def _existing_identification_hashes(account) -> list[str]:
 	try:
 		values = json.loads(account.identification_hashes_json or "[]")
-	except TypeError, ValueError:
+	except (TypeError, ValueError):
 		values = []
 	return values if isinstance(values, list) else []
 
