@@ -706,6 +706,8 @@ def _upsert_discovered_account(connection, account, fallback_currency=None):
 	identification_hash = _account_identity_hash(provider_identification_hash)
 
 	provider_currency = account.get("currency")
+	if not provider_currency:
+		frappe.throw(_("The bank did not provide an account currency."))
 
 	if provider_currency == "XXX":
 		if not fallback_currency:
