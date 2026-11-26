@@ -721,7 +721,7 @@ def _upsert_discovered_account(connection, account, fallback_currency=None):
 		"product": account.get("product"),
 		"currency": (
 			fallback_currency
-			if account.get("currency") == "XXX" and fallbcak_currency
+			if account.get("currency") == "XXX" and fallback_currency
 			else account.get("currency")
 		),
 		"provider_currency": account.get("currency"),
