@@ -703,30 +703,27 @@ def _upsert_discovered_account(connection, account, fallback_currency=None):
 	resource_uid = account.get("uid")
 	if not resource_uid:
 		frappe.throw(_("Enable Banking returned an account without a resource UID."))
-	identification_hash = _account_identity_hash(provider_identification_hash
-	provider_currency = account.get("currency")
-	
-	if provider_currency == "XXX":
-    	if not fallback_currency:
-			frappe.throw(
-                _("The bank returned an unknown currency (XXX). Please configure a fallback currency.")
-            )
-        effective_currency = fallback_currency
-    else:
-        effective_currency = provider_currency
+	identification_hash = _account_identity_hash(provider_identification_hash)
 
-        if (
-            fallback_currency
-            and provider_currency
-            and provider_currency != fallback_currency
-        ):
-            frappe.throw(
-                _(
-                    "Currency mismatch: the bank returned {0}, "
-                    "but you selected {1}. Please verify the account currency."
-                ).format(provider_currency, fallback_currency)
-    		)
-	
+	provider_currency = account.get("currency")
+
+	if provider_currency == "XXX":
+		if not fallback_currency:
+			frappe.throw(
+				_("The bank returned an unknown currency (XXX). Please configure a fallback currency.")
+			)
+		effective_currency = fallback_currency
+	else:
+		effective_currency = provider_currency
+
+		if fallback_currency and provider_currency and provider_currency != fallback_currency:
+			frappe.throw(
+				_(
+					"Currency mismatch: the bank returned {0}, "
+					"but you selected {1}. Please verify the account currency."
+				).format(provider_currency, fallback_currency)
+			)
+
 	values = {
 		"connection": connection.name,
 		"company": connection.company,
@@ -946,7 +943,7 @@ def _masked_identifier(account: dict[str, Any]) -> str | None:
 def _metadata(integration) -> dict[str, Any]:
 	try:
 		return json.loads(integration.account_metadata_json or "{}")
-	except TypeError, ValueError:
+	except (TypeError, ValueError):
 		return {}
 
 
