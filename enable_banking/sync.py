@@ -467,7 +467,11 @@ def _update_account_details(account, details: dict[str, Any]) -> None:
 		"account_name": details.get("name"),
 		"account_description": details.get("details"),
 		"product": details.get("product"),
-		"currency": details.get("currency") or account.currency,
+		"currency": (
+			account.currency
+			if details.get("currency") in (None, "", "XXX")
+			else details.get("currency")
+		),
 		"usage": details.get("usage"),
 		"cash_account_type": details.get("cash_account_type"),
 		"psu_status": details.get("psu_status"),
