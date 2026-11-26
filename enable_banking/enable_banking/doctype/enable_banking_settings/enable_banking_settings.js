@@ -68,11 +68,14 @@ function show_connect_bank_dialog(frm) {
             			.then((response) => {
                 			if (dialog.get_value("company") !== company) return;
 
-                			dialog.set_value(
-                    			"fallback_currency",
-                    			response.message?.default_currency || ""
-                			);
-            			});
+							if (dialog.get_value("fallback_currency")) return;
+
+							const default_currency = response.message?.default_currency;
+
+							if (default_currency) {
+								dialog.set_value("fallback_currency", default_currency);
+							}
+						});
     			},
 			},
 			{
