@@ -44,7 +44,7 @@ class FakeDocument:
 class Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        code = Path(__file__).with_name('onboarding.py').read_text(encoding='utf-8')
+        code = (Path(__file__).resolve().parent.parent / "onboarding.py").read_text(encoding="utf-8")
         tree = ast.parse(code)
         selected = next(node for node in tree.body
                         if isinstance(node, ast.FunctionDef)
