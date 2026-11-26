@@ -56,6 +56,7 @@ def start_authorization(
 	psu_type: str,
 	consent_days: int,
 	automatic_sync: int = 0,
+	fallback_currency: str | None = None,
 ) -> dict[str, Any]:
 	_require_manager()
 	return _start_authorization(
@@ -66,6 +67,7 @@ def start_authorization(
 		psu_type=psu_type,
 		consent_days=consent_days,
 		automatic_sync=automatic_sync,
+		fallback_currency=fallback_currency,
 	)
 
 
@@ -78,6 +80,7 @@ def _start_authorization(
 	psu_type: str,
 	consent_days: int,
 	automatic_sync: int = 0,
+	fallback_currency: str | None = None,
 	reauthorization_connection: str | None = None,
 ) -> dict[str, Any]:
 	settings = frappe.get_single(SETTINGS_DOCTYPE)
@@ -96,6 +99,13 @@ def _start_authorization(
 		frappe.throw(_("Consent Days must be at least one day."))
 
 	_validate_parent_account(parent_gl_account, company)
+
+	if fallback_currency is not None:
+		fallback_currency = str(fallback_currency).strip().upper()
+
+		if not fallback_currency or not frappe.db.exists("currency", fallback_currency):
+			frappe.throw(_("Please select a valid fallback currency."))
+			
 	aspsp = _find_aspsp(country, aspsp_name, psu_type)
 	maximum_seconds = cint(aspsp.get("maximum_consent_validity"))
 	if maximum_seconds <= 0:
@@ -117,6 +127,7 @@ def _start_authorization(
 				"state_hash": state_hash,
 				"company": company,
 				"parent_gl_account": parent_gl_account,
+				"fallback_currency": fallback_currency,
 				"aspsp_name": aspsp_name,
 				"aspsp_country": country,
 				"psu_type": psu_type,
@@ -373,6 +384,7 @@ def reauthorize(connection: str) -> dict[str, Any]:
 		psu_type=connection_doc.psu_type,
 		consent_days=validity_days,
 		automatic_sync=connection_doc.automatic_sync,
+		fallback_currency=source.fallback_currency if source else None,
 		reauthorization_connection=connection_doc.name,
 	)
 
@@ -527,7 +539,11 @@ def _create_connection_and_accounts(authorization, session):
 			).insert(ignore_permissions=True)
 
 	for account in session.get("accounts") or []:
-		_upsert_discovered_account(connection, account)
+		_upsert_discovered_account(
+			connection,
+			account,
+			fallback_currency=authorization.fallback_currency,
+		)
 	_refresh_connection_details_after_authorization(connection)
 	return connection, superseded_session_id
 
@@ -679,7 +695,7 @@ def _refresh_connection_details_after_authorization(connection) -> None:
 		connection.db_set("last_error", _safe_error(exc), update_modified=False)
 
 
-def _upsert_discovered_account(connection, account):
+def _upsert_discovered_account(connection, account, fallback_currency=None):
 	provider_identification_hash = account.get("identification_hash")
 	if not provider_identification_hash:
 		frappe.throw(_("Enable Banking returned an account without an identification hash."))
@@ -702,7 +718,11 @@ def _upsert_discovered_account(connection, account):
 		"account_name": account.get("name"),
 		"account_description": account.get("details"),
 		"product": account.get("product"),
-		"currency": account.get("currency"),
+		"currency": (
+			fallback_currency
+			if account.get("currency") == "XXX" and fallbcak_currency
+			else account.get("currency")
+		),
 		"usage": account.get("usage"),
 		"cash_account_type": account.get("cash_account_type"),
 		"psu_status": account.get("psu_status"),
