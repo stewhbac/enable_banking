@@ -22,6 +22,7 @@
   "product",
   "provider_column",
   "currency",
+  "provider_currency",
   "usage",
   "cash_account_type",
   "psu_status",
@@ -170,6 +171,13 @@
    "label": "Currency",
    "options": "Currency",
    "read_only": 1
+  },
+  {
+   "fieldname": "provider_currency",
+   "fieldtype": "Data",
+   "label": "Original Provider Currency",
+   "read_only": 1,
+   "description": "Original currency code returned by Enable Banking, before applying any fallback."
   },
   {
    "fieldname": "usage",
