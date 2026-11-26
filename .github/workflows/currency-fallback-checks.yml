@@ -1,0 +1,47 @@
+name: Currency fallback checks
+
+on:
+  push:
+    branches:
+      - Feature/Currency-fallback
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout submitted code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Check Python syntax
+        run: |
+          python -m py_compile enable_banking/onboarding.py enable_banking/sync.py
+
+      - name: Check DocType JSON
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('enable_banking/enable_banking/doctype')
+          files = sorted(root.rglob('*.json'))
+          assert files, 'No DocType JSON files found'
+          for file in files:
+              json.loads(file.read_text(encoding='utf-8'))
+          print(f'{len(files)} DocType JSON files: valid')
+          PY
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check enable_banking/enable_banking/doctype/enable_banking_settings/enable_banking_settings.js
+
+      - name: Run offline currency regression tests
+        run: |
+          python -m unittest discover -s enable_banking/tests -p 'test_currency_fallback_standalone.py' -v
