@@ -384,7 +384,7 @@ def reauthorize(connection: str) -> dict[str, Any]:
 		psu_type=connection_doc.psu_type,
 		consent_days=validity_days,
 		automatic_sync=connection_doc.automatic_sync,
-		fallback_currency=source.fallback_currency if source else None,
+		fallback_currency=connection_doc.fallback_currency or (source.fallback_currency if source else None),
 		reauthorization_connection=connection_doc.name,
 	)
 
@@ -497,6 +497,7 @@ def _create_connection_and_accounts(authorization, session):
 		"authorization_status": "AUTHORIZED",
 		"company": authorization.company,
 		"parent_gl_account": authorization.parent_gl_account,
+		"fallback_currency": authorization.fallback_currency,
 		"automatic_sync": authorization.automatic_sync,
 		"aspsp_name": aspsp.get("name") or authorization.aspsp_name,
 		"aspsp_country": aspsp.get("country") or authorization.aspsp_country,
