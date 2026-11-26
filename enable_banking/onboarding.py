@@ -103,7 +103,7 @@ def _start_authorization(
 	if fallback_currency is not None:
 		fallback_currency = str(fallback_currency).strip().upper()
 
-		if not fallback_currency or not frappe.db.exists("currency", fallback_currency):
+		if not fallback_currency or not frappe.db.exists("Currency", fallback_currency):
 			frappe.throw(_("Please select a valid fallback currency."))
 			
 	aspsp = _find_aspsp(country, aspsp_name, psu_type)
