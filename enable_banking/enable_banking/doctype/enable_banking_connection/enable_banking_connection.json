@@ -9,6 +9,7 @@
   "authorization_status",
   "company",
   "parent_gl_account",
+  "fallback_currency",
   "automatic_sync",
   "connection_column",
   "aspsp_name",
@@ -67,6 +68,13 @@
    "options": "Account",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "fallback_currency",
+   "fieldtype": "Link",
+   "label": "Fallback Currency",
+   "options": "Currency",
+   "read_only": 1
   },
   {
    "default": "0",

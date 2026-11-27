@@ -16,7 +16,7 @@ frappe.ui.form.on("Enable Banking Settings", {
 				})
 				.then((response) => {
 					frappe.show_alert(
-						__("Queued {0} account(s).", [response.message?.queued || 0]),
+						__("Queued {0} account(s).", [response.message?.queued || 0])
 					);
 				});
 		});
@@ -29,7 +29,7 @@ frappe.ui.form.on("Enable Banking Settings", {
 		frm.add_custom_button(
 			__("Paste Private Key"),
 			() => show_private_key_dialog(frm),
-			__("Private Key"),
+			__("Private Key")
 		);
 
 		if (frm.doc.private_key_configured) {
@@ -40,7 +40,7 @@ frappe.ui.form.on("Enable Banking Settings", {
 						frm.call("clear_private_key").then(() => frm.reload_doc());
 					});
 				},
-				__("Private Key"),
+				__("Private Key")
 			);
 		}
 	},
@@ -56,6 +56,35 @@ function show_connect_bank_dialog(frm) {
 				fieldtype: "Link",
 				label: __("Company"),
 				options: "Company",
+				reqd: 1,
+				onchange() {
+					const company = dialog.get_value("company");
+
+					dialog.set_value("fallback_currency", "");
+
+					if (!company) return;
+
+					frappe.db
+						.get_value("Company", company, "default_currency")
+						.then((response) => {
+							if (dialog.get_value("company") !== company) return;
+
+							if (dialog.get_value("fallback_currency")) return;
+
+							const default_currency = response.message?.default_currency;
+
+							if (default_currency) {
+								dialog.set_value("fallback_currency", default_currency);
+							}
+						});
+				},
+			},
+			{
+				fieldname: "fallback_currency",
+				fieldtype: "Link",
+				label: __("Bank Account Currency"),
+				options: "Currency",
+				description: __("Defaults to the company currency. Change it if necessary."),
 				reqd: 1,
 			},
 			{
@@ -103,18 +132,15 @@ function show_connect_bank_dialog(frm) {
 				reqd: 1,
 				onchange() {
 					const selected = aspsps.find(
-						(aspsp) => aspsp.name === dialog.get_value("aspsp_name"),
+						(aspsp) => aspsp.name === dialog.get_value("aspsp_name")
 					);
 					if (!selected) return;
 					const max_days = Math.max(
 						1,
-						Math.floor(selected.maximum_consent_validity / 86400),
+						Math.floor(selected.maximum_consent_validity / 86400)
 					);
 					const consent = dialog.get_field("consent_days");
-					consent.df.description = __(
-						"This bank permits at most {0} days.",
-						[max_days],
-					);
+					consent.df.description = __("This bank permits at most {0} days.", [max_days]);
 					consent.refresh();
 					if (dialog.get_value("consent_days") > max_days) {
 						dialog.set_value("consent_days", max_days);
@@ -186,7 +212,7 @@ function load_aspsps(dialog) {
 			dialog.set_df_property(
 				"aspsp_name",
 				"options",
-				rows.map((aspsp) => aspsp.name).join("\n"),
+				rows.map((aspsp) => aspsp.name).join("\n")
 			);
 			return rows;
 		});
@@ -235,9 +261,7 @@ function setup_private_key_file_input(dialog) {
 	});
 	const $description = $("<p>", {
 		class: "help-box small text-muted",
-		text: __(
-			"The file is read in this browser and is not uploaded as an attachment.",
-		),
+		text: __("The file is read in this browser and is not uploaded as an attachment."),
 	});
 	const $status = $("<p>", {
 		class: "small text-muted",
@@ -266,9 +290,7 @@ function setup_private_key_file_input(dialog) {
 				return dialog.set_value("private_key", private_key);
 			})
 			.then(() => {
-				$status
-					.removeClass("text-danger")
-					.text(__("Loaded {0}.", [file.name]));
+				$status.removeClass("text-danger").text(__("Loaded {0}.", [file.name]));
 			})
 			.catch((error) => {
 				const message =

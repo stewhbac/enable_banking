@@ -455,6 +455,15 @@ def _update_account_details(account, details: dict[str, Any]) -> None:
 	if not isinstance(details, dict):
 		frappe.throw(_("Enable Banking returned invalid account details."))
 
+	provider_currency = details.get("currency")
+
+	if provider_currency not in (None, "", "XXX") and provider_currency != account.currency:
+		frappe.throw(
+			_(
+				"Currency mismatch during synchronization: the bank returned {0}, but the account uses {1}."
+			).format(provider_currency, account.currency)
+		)
+
 	values = {
 		"resource_uid": details.get("uid") or account.resource_uid,
 		"identification_hashes_json": json.dumps(
@@ -467,7 +476,10 @@ def _update_account_details(account, details: dict[str, Any]) -> None:
 		"account_name": details.get("name"),
 		"account_description": details.get("details"),
 		"product": details.get("product"),
-		"currency": details.get("currency") or account.currency,
+		"currency": account.currency,
+		"provider_currency": (
+			provider_currency if provider_currency is not None else account.provider_currency
+		),
 		"usage": details.get("usage"),
 		"cash_account_type": details.get("cash_account_type"),
 		"psu_status": details.get("psu_status"),
@@ -619,7 +631,7 @@ def _provider_datetime(value: Any) -> datetime | None:
 				parsed = datetime.combine(date.fromisoformat(value), time.min)
 			else:
 				parsed = get_datetime(value)
-		except TypeError, ValueError:
+		except (TypeError, ValueError):
 			return None
 	if parsed.tzinfo is not None:
 		parsed = convert_utc_to_system_timezone(parsed.astimezone(UTC))
@@ -633,7 +645,7 @@ def _parse_normalized_as_of(value: Any) -> datetime | None:
 		return value
 	try:
 		return get_datetime(value)
-	except TypeError, ValueError:
+	except (TypeError, ValueError):
 		return None
 
 
@@ -642,7 +654,7 @@ def _decimal_or_none(value: Any) -> Decimal | None:
 		return None
 	try:
 		return Decimal(str(value))
-	except InvalidOperation, ValueError:
+	except (InvalidOperation, ValueError):
 		return None
 
 
@@ -728,7 +740,7 @@ def _transaction_date(transaction: dict[str, Any]) -> date:
 			continue
 		try:
 			return getdate(value)
-		except TypeError, ValueError:
+		except (TypeError, ValueError):
 			continue
 	raise ValueError(_("Transaction has no valid booking, value, or transaction date."))
 
@@ -815,7 +827,7 @@ def _sha256_json(value: Any) -> str:
 def _existing_identification_hashes(account) -> list[str]:
 	try:
 		values = json.loads(account.identification_hashes_json or "[]")
-	except TypeError, ValueError:
+	except (TypeError, ValueError):
 		values = []
 	return values if isinstance(values, list) else []
 

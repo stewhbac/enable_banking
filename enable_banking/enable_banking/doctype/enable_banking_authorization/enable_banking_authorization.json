@@ -16,6 +16,7 @@
   "onboarding_section",
   "company",
   "parent_gl_account",
+  "fallback_currency",
   "onboarding_column",
   "aspsp_name",
   "aspsp_country",
@@ -119,6 +120,14 @@
    "options": "Account",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+  "fieldname": "fallback_currency",
+  "fieldtype": "Link",
+  "label": "Fallback Currency",
+  "options": "Currency",
+  "read_only": 1,
+  "reqd": 0
   },
   {
    "fieldname": "onboarding_column",

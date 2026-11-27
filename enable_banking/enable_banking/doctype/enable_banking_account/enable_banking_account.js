@@ -26,7 +26,9 @@ frappe.ui.form.on("Enable Banking Account", {
 			});
 			frm.add_custom_button(__("Unmap Bank Account"), () => {
 				frappe.confirm(
-					__("Remove this mapping and clear Enable Banking balances from the Bank Account?"),
+					__(
+						"Remove this mapping and clear Enable Banking balances from the Bank Account?"
+					),
 					() => {
 						frappe
 							.call({
@@ -35,7 +37,7 @@ frappe.ui.form.on("Enable Banking Account", {
 								freeze: true,
 							})
 							.then(() => frm.reload_doc());
-					},
+					}
 				);
 			});
 		}
@@ -86,7 +88,7 @@ frappe.ui.form.on("Enable Banking Account", {
 		frm.add_custom_button(__("Create ERPNext Bank Account"), () => {
 			frappe.confirm(
 				__(
-					"Create a Bank, Bank-type GL Account, and Bank Account for this provider account?",
+					"Create a Bank, Bank-type GL Account, and Bank Account for this provider account?"
 				),
 				() => {
 					frappe
@@ -96,7 +98,7 @@ frappe.ui.form.on("Enable Banking Account", {
 							freeze: true,
 						})
 						.then(() => frm.reload_doc());
-				},
+				}
 			);
 		});
 	},
