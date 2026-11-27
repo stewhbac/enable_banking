@@ -384,7 +384,8 @@ def reauthorize(connection: str) -> dict[str, Any]:
 		psu_type=connection_doc.psu_type,
 		consent_days=validity_days,
 		automatic_sync=connection_doc.automatic_sync,
-		fallback_currency=getattr(connection_doc, "fallback_currency", None) or (getattr(source, "fallback_currency", None) if source else None),
+		fallback_currency=getattr(connection_doc, "fallback_currency", None)
+		or (getattr(source, "fallback_currency", None) if source else None),
 		reauthorization_connection=connection_doc.name,
 	)
 
