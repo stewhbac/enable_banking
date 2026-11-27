@@ -497,7 +497,7 @@ def _create_connection_and_accounts(authorization, session):
 		"authorization_status": "AUTHORIZED",
 		"company": authorization.company,
 		"parent_gl_account": authorization.parent_gl_account,
-		"fallback_currency": authorization.fallback_currency,
+		"fallback_currency": getattr(authorization, "fallback_currency", None),
 		"automatic_sync": authorization.automatic_sync,
 		"aspsp_name": aspsp.get("name") or authorization.aspsp_name,
 		"aspsp_country": aspsp.get("country") or authorization.aspsp_country,
@@ -543,7 +543,7 @@ def _create_connection_and_accounts(authorization, session):
 		_upsert_discovered_account(
 			connection,
 			account,
-			fallback_currency=authorization.fallback_currency,
+			fallback_currency=getattr(authorization, "fallback_currency", None),
 		)
 	_refresh_connection_details_after_authorization(connection)
 	return connection, superseded_session_id
